@@ -10,8 +10,11 @@ const {
 
 class TaskController {
   static async getAll(req, res, next) {
+    const userId = req.user.id;
+
     try {
       const data = await Task.findAll({
+        where: { user_id: userId },
         include: [Priority, Due],
       });
       res.status(200).json(data);
@@ -20,10 +23,11 @@ class TaskController {
     }
   }
   static async getOne(req, res, next) {
+    const userId = req.user.id;
     const { id } = req.params;
     try {
       const data = await Task.findOne({
-        where: { id },
+        where: { id, user_id: userId },
         include: [Priority, Task_detail, Due],
       });
       if (data) {
