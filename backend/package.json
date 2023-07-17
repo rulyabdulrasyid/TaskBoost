@@ -1,7 +1,7 @@
 {
   "name": "taskboost_backend",
   "version": "1.0.0",
-  "main": "app.js",
+  "main": "index.js",
   "repository": "https://github.com/rulyabdulrasyid/TaskBoost.git",
   "author": "Ruly Abdul Rasyid",
   "license": "MIT",
