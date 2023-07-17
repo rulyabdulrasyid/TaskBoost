@@ -22,6 +22,7 @@ class TaskController {
       next(err);
     }
   }
+
   static async getOne(req, res, next) {
     const userId = req.user.id;
     const { id } = req.params;
@@ -39,19 +40,18 @@ class TaskController {
       next(err);
     }
   }
+
   static async create(req, res, next) {
     const userId = req.user.id;
     const { name, task_detail, status, priority_id, due_id } = req.body;
 
     try {
-      // Buat task baru
       const task = await sequelize.transaction(async (t) => {
         const createdTask = await Task.create(
           { user_id: userId, name },
           { transaction: t }
         );
 
-        // Buat detail tugasnya
         const taskDetails = task_detail.map((detail, index) => ({
           task_id: createdTask.id,
           task_detail: detail,
@@ -60,13 +60,11 @@ class TaskController {
 
         await Task_detail.bulkCreate(taskDetails, { transaction: t });
 
-        // Priority
         await Task_priority.create(
           { task_id: createdTask.id, priority_id },
           { transaction: t }
         );
 
-        // Due
         await Task_due.create(
           { task_id: createdTask.id, due_id },
           { transaction: t }
@@ -74,11 +72,13 @@ class TaskController {
 
         return createdTask;
       });
+
       res.status(201).json(task);
     } catch (err) {
       next(err);
     }
   }
+
   static async delete(req, res, next) {
     const userId = req.user.id;
     const taskId = req.params.id;
@@ -95,7 +95,10 @@ class TaskController {
           transaction: t,
         });
 
-        await Task_due.destroy({ where: { task_id: taskId }, transaction: t });
+        await Task_due.destroy({
+          where: { task_id: taskId },
+          transaction: t,
+        });
 
         const deleteTask = await Task.destroy({
           where: { id: taskId, user_id: userId },
@@ -104,7 +107,8 @@ class TaskController {
 
         return deleteTask;
       });
-      res.status(200).json({ message: `Task deleted successffuly` });
+
+      res.status(200).json({ message: `Task deleted successfully` });
     } catch (err) {
       next(err);
     }
