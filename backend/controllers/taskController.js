@@ -79,6 +79,45 @@ class TaskController {
       next(err);
     }
   }
+  static async update(req, res, next) {
+    const userId = req.user.id;
+    const { id } = req.params;
+    const { name, task_detail, status, priority_id, due_id } = req.body;
+    try {
+      await sequelize.transaction(async (t) => {
+        // Update Task
+        const [updateTaskCount, [updatedTask]] = await Task.update(
+          { name },
+          { where: { id, user_id: userId }, returning: true, transaction: t }
+        );
+
+        // Update Task_detail
+        await Task_detail.destroy({ where: { task_id: id }, transaction: t });
+
+        const taskDetails = task_detail.map((detail, index) => ({
+          task_id: id,
+          task_detail: detail,
+          status: status[index],
+        }));
+
+        await Task_detail.bulkCreate(taskDetails, { transaction: t });
+
+        // Update priority
+        await Task_priority.update({ priority_id }, { where: { task_id: id } });
+
+        // Update due
+        await Task_due.update(
+          { due_id },
+          { where: { task_id: id }, transaction: t }
+        );
+
+        res.status(200).json(updatedTask);
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
   static async delete(req, res, next) {
     const userId = req.user.id;
     const taskId = req.params.id;
