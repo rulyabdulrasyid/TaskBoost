@@ -16,13 +16,3 @@ function auth(req, res, next) {
 }
 
 module.exports = auth;
-
-// const authPage = (permissions) => {
-//     return (req, res, next)=>{
-//         const user_id= req.body
-//     }
-// };
-
-// const authData = (req, res, next) => {};
-
-// module.exports = { authPage, authPage };
