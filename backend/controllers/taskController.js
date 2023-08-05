@@ -15,7 +15,7 @@ class TaskController {
     try {
       const data = await Task.findAll({
         where: { user_id: userId },
-        include: [Priority, Due],
+        include: [Priority, Due, Task_detail],
       });
       res.status(200).json(data);
     } catch (err) {
